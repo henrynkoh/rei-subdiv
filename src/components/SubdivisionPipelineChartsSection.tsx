@@ -20,11 +20,14 @@ import {
   YAxis,
 } from "recharts";
 import {
+  BUILDING_OPEN_DATA_ID,
   PIPELINE_CHART_DISCLAIMER,
   PIPELINE_DATA_AS_OF,
   PIPELINE_OPEN_DATA_ID,
   type PipelineYearRow,
+  type PlatLinkedBuildingYearRow,
   pipelineSeries,
+  platLinkedBuildingSeries,
 } from "@/data/subdivision-pipeline-chart-data";
 
 const chartCard =
@@ -38,6 +41,26 @@ const colors = {
   completed: "#10b981",
 };
 
+const buildingColors = {
+  bpApplied: "#14b8a6",
+  bpIssued: "#0ea5e9",
+  bpCompleted: "#22c55e",
+  bpActiveDec31: "#f97316",
+};
+
+const buildingSeriesMeta: {
+  key: keyof Pick<
+    PlatLinkedBuildingYearRow,
+    "bpApplied" | "bpIssued" | "bpCompleted" | "bpActiveDec31"
+  >;
+  label: string;
+}[] = [
+  { key: "bpApplied", label: "BP applied (year)" },
+  { key: "bpIssued", label: "BP issued (year)" },
+  { key: "bpCompleted", label: "BP completed (year)" },
+  { key: "bpActiveDec31", label: "BP in flight (Dec 31)" },
+];
+
 const seriesMeta: { key: keyof Pick<
   PipelineYearRow,
   "applications" | "permitApprovals" | "inConstruction" | "soonToComplete" | "completed"
@@ -48,6 +71,46 @@ const seriesMeta: { key: keyof Pick<
   { key: "soonToComplete", label: "Issued, open (Dec 31)" },
   { key: "completed", label: "LU completed (year)" },
 ];
+
+function PlatLinkedTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: { name: string; value: number; color: string }[];
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  const row = platLinkedBuildingSeries.find((r) => r.yearLabel === label);
+  return (
+    <div className="rounded-xl border border-zinc-200/80 bg-white/95 px-3 py-2 text-xs shadow-lg dark:border-zinc-600 dark:bg-zinc-900/95">
+      <p className="font-bold text-zinc-900 dark:text-white">
+        {label}{" "}
+        <span
+          className={
+            row?.phase === "projection"
+              ? "text-fuchsia-600 dark:text-fuchsia-400"
+              : "text-teal-600 dark:text-teal-400"
+          }
+        >
+          ({row?.phase === "projection" ? "projection" : "actual"})
+        </span>
+      </p>
+      <ul className="mt-1 space-y-0.5">
+        {payload.map((p) => (
+          <li key={p.name} className="flex justify-between gap-4">
+            <span className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
+              <span className="h-2 w-2 rounded-full" style={{ background: p.color }} />
+              {p.name}
+            </span>
+            <span className="font-mono font-semibold text-zinc-900 dark:text-zinc-100">{p.value}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 function PipelineTooltip({
   active,
@@ -117,10 +180,10 @@ export function SubdivisionPipelineChartsSection() {
           Single-family land subdivision · pipeline viz
         </p>
         <h2 className="mt-3 text-2xl font-bold tracking-tight text-zinc-900 dark:text-white md:text-3xl">
-          Stats charts: Seattle LU open data · 5-year actuals + 3-year trend projection
+          Stats charts: Seattle land use + plat-linked building permits
         </h2>
         <p className="mt-2 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-          Source snapshot {PIPELINE_DATA_AS_OF} · dataset{" "}
+          Snapshot {PIPELINE_DATA_AS_OF} · LU{" "}
           <a
             className="text-fuchsia-700 underline decoration-fuchsia-400/60 underline-offset-2 hover:text-fuchsia-900 dark:text-fuchsia-300 dark:hover:text-fuchsia-200"
             href={`https://data.seattle.gov/d/${PIPELINE_OPEN_DATA_ID}`}
@@ -129,6 +192,16 @@ export function SubdivisionPipelineChartsSection() {
           >
             {PIPELINE_OPEN_DATA_ID}
           </a>
+          {" · "}
+          Building{" "}
+          <a
+            className="text-fuchsia-700 underline decoration-fuchsia-400/60 underline-offset-2 hover:text-fuchsia-900 dark:text-fuchsia-300 dark:hover:text-fuchsia-200"
+            href={`https://data.seattle.gov/d/${BUILDING_OPEN_DATA_ID}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {BUILDING_OPEN_DATA_ID}
+          </a>
         </p>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
           {PIPELINE_CHART_DISCLAIMER}
@@ -136,7 +209,7 @@ export function SubdivisionPipelineChartsSection() {
       </header>
 
       <article id="spc-trends" className={`scroll-mt-24 md:scroll-mt-20 ${chartCard}`}>
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Multi-metric trend lines</h3>
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Land use · Multi-metric trend lines</h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           Gradient line chart with shaded projection window (2026–2028).
         </p>
@@ -181,7 +254,7 @@ export function SubdivisionPipelineChartsSection() {
       </article>
 
       <article id="spc-stacked" className={`scroll-mt-24 md:scroll-mt-20 ${chartCard}`}>
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Stacked pipeline areas</h3>
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Land use · Stacked pipeline areas</h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           Cumulative weight of the five series—note calendar-year flows stack with Dec 31 inventory in the same view.
         </p>
@@ -224,7 +297,7 @@ export function SubdivisionPipelineChartsSection() {
       </article>
 
       <article id="spc-bars" className={`scroll-mt-24 md:scroll-mt-20 ${chartCard}`}>
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Grouped bars · year-over-year</h3>
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Land use · Grouped bars · year-over-year</h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           Side-by-side YoY comparison; legend labels encode flow vs. year-end stock (see section header disclaimer).
         </p>
@@ -256,9 +329,60 @@ export function SubdivisionPipelineChartsSection() {
         </div>
       </article>
 
+      <article id="spc-plat-bp" className={`scroll-mt-24 md:scroll-mt-20 ${chartCard}`}>
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Plat-linked building permits</h3>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <span className="font-medium text-zinc-800 dark:text-zinc-200">permittypemapped = Building</span>{" "}
+          only; <span className="font-medium text-zinc-800 dark:text-zinc-200">relatedmup</span> must match a
+          land-use record in the plat-family slice above—this is the closest open-data link from entitlement to
+          construction, not every single-family start citywide.
+        </p>
+        <div className="mt-4 h-[340px] w-full min-w-0 min-h-[280px]">
+          {mounted ? (
+            <ResponsiveContainer width="100%" height="100%" minWidth={280}>
+              <LineChart
+                data={platLinkedBuildingSeries}
+                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30 dark:opacity-20" stroke="#64748b" />
+                <ReferenceArea
+                  x1="2026"
+                  x2="2028"
+                  fill="#0ea5e9"
+                  fillOpacity={0.06}
+                  strokeOpacity={0}
+                />
+                <XAxis
+                  dataKey="yearLabel"
+                  tick={{ fill: "#64748b", fontSize: 11 }}
+                  axisLine={{ stroke: "#64748b" }}
+                />
+                <YAxis tick={{ fill: "#64748b", fontSize: 11 }} axisLine={{ stroke: "#64748b" }} />
+                <Tooltip content={<PlatLinkedTooltip />} />
+                <Legend wrapperStyle={{ fontSize: "12px" }} />
+                {buildingSeriesMeta.map((m) => (
+                  <Line
+                    key={m.key}
+                    type="monotone"
+                    dataKey={m.key}
+                    name={m.label}
+                    stroke={buildingColors[m.key]}
+                    strokeWidth={2.5}
+                    dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
+                    activeDot={{ r: 6 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <SkeletonChart />
+          )}
+        </div>
+      </article>
+
       <article id="spc-mix" className={`scroll-mt-24 md:scroll-mt-20 ${chartCard}`}>
         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
-          Stage mix · last actual year ({lastActualYear.yearLabel})
+          Land use · Stage mix · last actual year ({lastActualYear.yearLabel})
         </h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           Donut mixes{" "}

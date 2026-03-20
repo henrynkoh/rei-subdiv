@@ -1,24 +1,22 @@
 /**
  * Seattle single-family–oriented land reconfiguration pipeline — derived from published open data.
  *
- * **Source:** City of Seattle *Land Use Permits* on data.seattle.gov (Socrata id `ht3q-kdvx`).
- * **URL:** https://data.seattle.gov/d/ht3q-kdvx
- * **Snapshot:** counts below were computed 2026-03-20 (re-run `npm run data:pipeline` after that date).
+ * **Land use:** City of Seattle *Land Use Permits* — https://data.seattle.gov/d/ht3q-kdvx (`ht3q-kdvx`).
+ * **Plat-linked building:** *Building Permits* — https://data.seattle.gov/d/76t5-zqzr (`76t5-zqzr`), rows where
+ * `relatedmup` matches a LU permit number from the plat-family filter **and**
+ * `permittypemapped = 'Building'` (construction package; excludes standalone demo/grading-only siblings when typed differently).
  *
- * **Filter (text + class):** `permitclass = 'Single Family/Duplex'`,
- * `permittypemapped = 'Master Use Permit'`, and `description` contains any of:
- * short plat, boundary-between-parcel language, lot line adjustment, unit lot short, or adjust-the-boundary phrasing.
- * This approximates small-lot / short-plat–style **land use** work; it is not every Seattle subdivision,
- * excludes multifamily plats, and does **not** replace a title search.
+ * **Snapshot:** `PIPELINE_DATA_AS_OF` — refresh via `npm run data:pipeline`.
  *
- * **Metric definitions**
- * - `applications` — records with `applieddate` in that calendar year.
- * - `permitApprovals` — records with `issueddate` in that calendar year (excludes Withdrawn/Canceled).
- * - `inConstruction` — **misnamed in legacy UI:** pre-issue / pre-issuance backlog at Dec 31 (`issueddate` null or after year-end), excluding terminal statuses and permits already completed by year-end.
- * - `soonToComplete` — LU **issued on/before** Dec 31 but not Completed and not Withdrawn/Canceled (open post-issuance work at year-end).
- * - `completed` — `statuscurrent = Completed` with completion timestamp from `decisiondate` or, if absent, `issueddate`, in that calendar year.
+ * **LU filter:** `Single Family/Duplex` + `Master Use Permit` + description keywords (short plat, boundary adjustment, lot line, unit lot short).
  *
- * **Projections (2026–2028):** ordinary least-squares line fit on 2021–2025 actuals per series—**not** official SDCI forecasts.
+ * **LU metrics:** `applications`, `permitApprovals` (LU issued), `completed` (LU completion) = calendar-year;
+ * `inConstruction` = pre-issue LU backlog Dec 31; `soonToComplete` = LU issued, still open Dec 31.
+ *
+ * **Building metrics (plat-linked only):** `bpApplied` / `bpIssued` / `bpCompleted` (by `completeddate`) = calendar-year;
+ * `bpActiveDec31` = issued by year-end, not Completed, completion not recorded by year-end.
+ *
+ * **2026–2028:** OLS on 2021–2025 per series — not SDCI forecasts.
  */
 
 export type PipelinePhase = "actual" | "projection";
@@ -34,7 +32,18 @@ export type PipelineYearRow = {
   completed: number;
 };
 
+export type PlatLinkedBuildingYearRow = {
+  yearLabel: string;
+  year: number;
+  phase: PipelinePhase;
+  bpApplied: number;
+  bpIssued: number;
+  bpCompleted: number;
+  bpActiveDec31: number;
+};
+
 export const PIPELINE_OPEN_DATA_ID = "ht3q-kdvx";
+export const BUILDING_OPEN_DATA_ID = "76t5-zqzr";
 export const PIPELINE_DATA_AS_OF = "2026-03-20";
 
 export const pipelineSeries: PipelineYearRow[] = [
@@ -120,17 +129,93 @@ export const pipelineSeries: PipelineYearRow[] = [
   },
 ];
 
-/** @deprecated Use `pipelineSeries`; name kept for brief import churn. */
+export const platLinkedBuildingSeries: PlatLinkedBuildingYearRow[] = [
+  {
+    yearLabel: "2021",
+    year: 2021,
+    phase: "actual",
+    bpApplied: 20,
+    bpIssued: 12,
+    bpCompleted: 17,
+    bpActiveDec31: 30,
+  },
+  {
+    yearLabel: "2022",
+    year: 2022,
+    phase: "actual",
+    bpApplied: 24,
+    bpIssued: 21,
+    bpCompleted: 15,
+    bpActiveDec31: 33,
+  },
+  {
+    yearLabel: "2023",
+    year: 2023,
+    phase: "actual",
+    bpApplied: 21,
+    bpIssued: 24,
+    bpCompleted: 17,
+    bpActiveDec31: 36,
+  },
+  {
+    yearLabel: "2024",
+    year: 2024,
+    phase: "actual",
+    bpApplied: 17,
+    bpIssued: 16,
+    bpCompleted: 26,
+    bpActiveDec31: 41,
+  },
+  {
+    yearLabel: "2025",
+    year: 2025,
+    phase: "actual",
+    bpApplied: 9,
+    bpIssued: 18,
+    bpCompleted: 14,
+    bpActiveDec31: 55,
+  },
+  {
+    yearLabel: "2026",
+    year: 2026,
+    phase: "projection",
+    bpApplied: 10,
+    bpIssued: 20,
+    bpCompleted: 19,
+    bpActiveDec31: 56,
+  },
+  {
+    yearLabel: "2027",
+    year: 2027,
+    phase: "projection",
+    bpApplied: 7,
+    bpIssued: 21,
+    bpCompleted: 20,
+    bpActiveDec31: 62,
+  },
+  {
+    yearLabel: "2028",
+    year: 2028,
+    phase: "projection",
+    bpApplied: 4,
+    bpIssued: 22,
+    bpCompleted: 20,
+    bpActiveDec31: 68,
+  },
+];
+
+/** @deprecated Use `pipelineSeries`. */
 export const pipelineDemoSeries = pipelineSeries;
 
 export const PIPELINE_CHART_DISCLAIMER =
-  "Actuals 2021–2025: City of Seattle Land Use Permits open data (data.seattle.gov, id ht3q-kdvx), filtered to Single Family/Duplex Master Use Permits with short-plat / boundary-adjustment wording in the project description—see module comment for exact rules. Calendar-year counts use applieddate, issueddate, or completion dates as noted; Dec 31 figures are point-in-time stock from the same snapshot, not field surveys. 2026–2028: straight-line statistical projection from those five years—not an agency forecast. Middle-housing and building permits are out of scope for this slice.";
+  "Land use: data.seattle.gov `ht3q-kdvx` (SF/Duplex MUPs, plat/boundary keywords). Plat-linked building: `76t5-zqzr` with `relatedmup` on that LU set and `permittypemapped = 'Building'`. LU completion ≠ building `completeddate`. Dec 31 counts = snapshot inventory from the export, not field verified. Shaded years: OLS on 2021–2025, not SDCI forecasts.";
 
 export function getPipelineChartNavChildren(): { id: string; label: string }[] {
   return [
-    { id: "spc-trends", label: "Multi-metric trends" },
-    { id: "spc-stacked", label: "Stacked pipeline" },
-    { id: "spc-bars", label: "Grouped YoY" },
-    { id: "spc-mix", label: "2025 stage mix" },
+    { id: "spc-trends", label: "LU · Trends" },
+    { id: "spc-stacked", label: "LU · Stacked" },
+    { id: "spc-bars", label: "LU · Bars" },
+    { id: "spc-plat-bp", label: "Plat-linked BP" },
+    { id: "spc-mix", label: "2025 mix" },
   ];
 }
