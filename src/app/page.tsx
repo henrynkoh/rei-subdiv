@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CurriculumTableBlock } from "@/components/CurriculumTableBlock";
+import { HeroFeaturePills } from "@/components/HeroFeaturePills";
 import { LandingExperience } from "@/components/LandingExperience";
 import {
   categories,
@@ -17,7 +18,7 @@ export default function Home() {
   const nav = getLandingNavItems();
 
   return (
-    <LandingExperience nav={nav}>
+    <LandingExperience nav={nav} scrollSpyDemoSectionId={categories[0].id}>
       <header
         id="overview"
         className="scroll-mt-24 border-b border-white/10 bg-gradient-to-b from-white/50 to-transparent px-4 pb-12 pt-16 dark:from-zinc-950/80 md:scroll-mt-8 md:pb-14 md:pt-10"
@@ -50,17 +51,7 @@ export default function Home() {
             education only—not legal, tax, securities, or investment advice. Confirm rules with
             professionals before deals.
           </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <span className="rounded-2xl border border-violet-200/60 bg-white/80 px-4 py-2 text-xs font-medium text-violet-900 shadow-sm dark:border-white/10 dark:bg-zinc-800/80 dark:text-violet-200">
-              Interactive sidebar navigation
-            </span>
-            <span className="rounded-2xl border border-fuchsia-200/60 bg-white/80 px-4 py-2 text-xs font-medium text-fuchsia-900 shadow-sm dark:border-white/10 dark:bg-zinc-800/80 dark:text-fuchsia-200">
-              Scroll-spy section highlight
-            </span>
-            <span className="rounded-2xl border border-amber-200/60 bg-white/80 px-4 py-2 text-xs font-medium text-amber-950 shadow-sm dark:border-white/10 dark:bg-zinc-800/80 dark:text-amber-100">
-              Print-friendly tables
-            </span>
-          </div>
+          <HeroFeaturePills />
         </div>
       </header>
 

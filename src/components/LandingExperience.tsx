@@ -2,17 +2,21 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { GitHubFab } from "@/components/GitHubFab";
+import { LandingActionsProvider } from "@/context/LandingActionsContext";
 import type { NavItem } from "@/data/site-nav";
 import { flattenNavIds } from "@/data/site-nav";
-import { GitHubFab } from "@/components/GitHubFab";
 
 type Props = {
   nav: NavItem[];
+  /** First major curriculum section id (e.g. `program`) — used by “Scroll-spy” hero button */
+  scrollSpyDemoSectionId: string;
   children: React.ReactNode;
 };
 
-export function LandingExperience({ nav, children }: Props) {
+export function LandingExperience({ nav, scrollSpyDemoSectionId, children }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarHot, setSidebarHot] = useState(false);
   const [activeId, setActiveId] = useState("overview");
   const flatIds = useMemo(() => flattenNavIds(nav), [nav]);
 
@@ -47,7 +51,28 @@ export function LandingExperience({ nav, children }: Props) {
     setMobileOpen(false);
   }, []);
 
+  const focusSidebar = useCallback(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+      setMobileOpen(true);
+    }
+    setSidebarHot(true);
+    window.setTimeout(() => setSidebarHot(false), 2600);
+  }, []);
+
+  const demoScrollSpy = useCallback(() => {
+    setMobileOpen(false);
+    document
+      .getElementById(scrollSpyDemoSectionId)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [scrollSpyDemoSectionId]);
+
+  const landingActions = useMemo(
+    () => ({ focusSidebar, demoScrollSpy }),
+    [focusSidebar, demoScrollSpy]
+  );
+
   return (
+    <LandingActionsProvider value={landingActions}>
     <div className="landing-root flex min-h-screen scroll-smooth">
       {/* Mobile menu toggle */}
       <button
@@ -76,8 +101,12 @@ export function LandingExperience({ nav, children }: Props) {
       {/* Left sidebar */}
       <aside
         id="section-nav"
-        className={`no-print fixed left-0 top-0 z-[85] flex h-full w-[min(18.5rem,92vw)] flex-col border-r border-white/20 bg-zinc-950/75 shadow-2xl backdrop-blur-xl transition-transform duration-300 dark:bg-zinc-950/85 md:translate-x-0 ${
+        className={`no-print fixed left-0 top-0 z-[85] flex h-full w-[min(18.5rem,92vw)] flex-col border-r border-white/20 bg-zinc-950/75 shadow-2xl backdrop-blur-xl transition-[transform,box-shadow] duration-300 dark:bg-zinc-950/85 md:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        } ${
+          sidebarHot
+            ? "z-[86] ring-2 ring-violet-400/90 ring-offset-2 ring-offset-zinc-950 shadow-[0_0_32px_rgba(139,92,246,0.45)] md:ring-offset-2"
+            : ""
         }`}
       >
         <div className="border-b border-white/10 px-4 py-5">
@@ -155,5 +184,6 @@ export function LandingExperience({ nav, children }: Props) {
 
       <GitHubFab />
     </div>
+    </LandingActionsProvider>
   );
 }
