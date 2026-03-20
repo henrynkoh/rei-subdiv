@@ -1,6 +1,7 @@
 import { getCaseStudyNavChildren } from "@/data/case-studies";
 import { categories } from "@/data/curriculum";
 import { getRegisteredProjectNavChildren } from "@/data/registered-projects";
+import { getPipelineChartNavChildren } from "@/data/subdivision-pipeline-chart-data";
 import { getSubdivisionLibraryNavChildren } from "@/data/subdivision-library";
 import { tableAnchorId } from "@/lib/slug";
 
@@ -32,6 +33,12 @@ export function getLandingNavItems(): NavItem[] {
       label: "Subdivision library",
       shortLabel: "Library",
       children: getSubdivisionLibraryNavChildren(),
+    },
+    {
+      id: "subdivision-pipeline-charts",
+      label: "Pipeline charts (demo data)",
+      shortLabel: "Charts",
+      children: getPipelineChartNavChildren(),
     },
     { id: "links", label: "Bookmarks & links", shortLabel: "Links" },
     { id: "research", label: "Research synthesis", shortLabel: "Research" },

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CaseStudiesSection } from "@/components/CaseStudiesSection";
 import { RegisteredProjectsSection } from "@/components/RegisteredProjectsSection";
 import { SubdivisionLibrarySection } from "@/components/SubdivisionLibrarySection";
+import { SubdivisionPipelineChartsSection } from "@/components/SubdivisionPipelineChartsSection";
 import { CurriculumTableBlock } from "@/components/CurriculumTableBlock";
 import { HeroFeaturePills } from "@/components/HeroFeaturePills";
 import { LandingExperience } from "@/components/LandingExperience";
@@ -64,6 +65,8 @@ export default function Home() {
         <RegisteredProjectsSection />
 
         <SubdivisionLibrarySection />
+
+        <SubdivisionPipelineChartsSection />
 
         <section id="links" className={`mb-10 scroll-mt-24 border border-indigo-200/50 md:scroll-mt-20 ${card}`}>
           <div className="flex items-start gap-3">

@@ -13,3 +13,4 @@
 - **Follow-ups**: optional password gate for `/facilitator` if hosted publicly; CMS only if non-devs edit weekly.
 - **Docs shipped**: `docs/QUICKSTART.md`, `docs/TUTORIAL.md`, `docs/MANUAL.md`, `docs/MARKETING_CHANNEL_KIT.md` (FB/IG/Threads/Blogger/Naver/Tistory/WordPress/newsletter/email), `docs/README.md`; root `README.md` links all of them.
 - **Landing**: `LandingExperience` + left scroll-spy sidebar + `GitHubFab`; `ConditionalChrome` hides top nav on `/`; static export + `BASE_PATH` for GitHub Pages; workflow `.github/workflows/pages.yml`; `.env.example`.
+- **Pipeline charts (demo)**: `SubdivisionPipelineChartsSection` + `subdivision-pipeline-chart-data.ts` (5y actual / 3y projection illustrative series); Recharts line, stacked area, grouped bar, donut; nav group “Pipeline charts (demo data)”; client mount via `requestAnimationFrame` to satisfy ESLint and avoid ResponsiveContainer SSR sizing; disclaimer in data module for non-official numbers.
