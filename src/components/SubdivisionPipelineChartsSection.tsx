@@ -21,8 +21,10 @@ import {
 } from "recharts";
 import {
   PIPELINE_CHART_DISCLAIMER,
+  PIPELINE_DATA_AS_OF,
+  PIPELINE_OPEN_DATA_ID,
   type PipelineYearRow,
-  pipelineDemoSeries,
+  pipelineSeries,
 } from "@/data/subdivision-pipeline-chart-data";
 
 const chartCard =
@@ -40,11 +42,11 @@ const seriesMeta: { key: keyof Pick<
   PipelineYearRow,
   "applications" | "permitApprovals" | "inConstruction" | "soonToComplete" | "completed"
 >; label: string }[] = [
-  { key: "applications", label: "Applications" },
-  { key: "permitApprovals", label: "Permit approvals" },
-  { key: "inConstruction", label: "In construction" },
-  { key: "soonToComplete", label: "Soon to complete" },
-  { key: "completed", label: "Completed" },
+  { key: "applications", label: "Applications (year)" },
+  { key: "permitApprovals", label: "LU issued (year)" },
+  { key: "inConstruction", label: "Pre-issue backlog (Dec 31)" },
+  { key: "soonToComplete", label: "Issued, open (Dec 31)" },
+  { key: "completed", label: "LU completed (year)" },
 ];
 
 function PipelineTooltip({
@@ -57,7 +59,7 @@ function PipelineTooltip({
   label?: string;
 }) {
   if (!active || !payload?.length) return null;
-  const row = pipelineDemoSeries.find((r) => r.yearLabel === label);
+  const row = pipelineSeries.find((r) => r.yearLabel === label);
   return (
     <div className="rounded-xl border border-zinc-200/80 bg-white/95 px-3 py-2 text-xs shadow-lg dark:border-zinc-600 dark:bg-zinc-900/95">
       <p className="font-bold text-zinc-900 dark:text-white">
@@ -95,7 +97,7 @@ export function SubdivisionPipelineChartsSection() {
   }, []);
 
   const lastActualYear =
-    pipelineDemoSeries.filter((r) => r.phase === "actual").at(-1) ?? pipelineDemoFallback();
+    pipelineSeries.filter((r) => r.phase === "actual").at(-1) ?? pipelineSeriesFallback();
   const mixData = seriesMeta.map((m) => ({
     name: m.label,
     value: lastActualYear[m.key],
@@ -115,8 +117,19 @@ export function SubdivisionPipelineChartsSection() {
           Single-family land subdivision · pipeline viz
         </p>
         <h2 className="mt-3 text-2xl font-bold tracking-tight text-zinc-900 dark:text-white md:text-3xl">
-          Stats charts: 5-year actuals + 3-year projections
+          Stats charts: Seattle LU open data · 5-year actuals + 3-year trend projection
         </h2>
+        <p className="mt-2 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+          Source snapshot {PIPELINE_DATA_AS_OF} · dataset{" "}
+          <a
+            className="text-fuchsia-700 underline decoration-fuchsia-400/60 underline-offset-2 hover:text-fuchsia-900 dark:text-fuchsia-300 dark:hover:text-fuchsia-200"
+            href={`https://data.seattle.gov/d/${PIPELINE_OPEN_DATA_ID}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {PIPELINE_OPEN_DATA_ID}
+          </a>
+        </p>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
           {PIPELINE_CHART_DISCLAIMER}
         </p>
@@ -130,7 +143,7 @@ export function SubdivisionPipelineChartsSection() {
         <div className="mt-4 h-[340px] w-full min-w-0 min-h-[280px]">
           {mounted ? (
           <ResponsiveContainer width="100%" height="100%" minWidth={280}>
-            <LineChart data={pipelineDemoSeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+            <LineChart data={pipelineSeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30 dark:opacity-20" stroke="#64748b" />
               <ReferenceArea
                 x1="2026"
@@ -170,12 +183,12 @@ export function SubdivisionPipelineChartsSection() {
       <article id="spc-stacked" className={`scroll-mt-24 md:scroll-mt-20 ${chartCard}`}>
         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Stacked pipeline areas</h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Shows cumulative weight of modeled stages—emphasizes how “work in flight” stacks.
+          Cumulative weight of the five series—note calendar-year flows stack with Dec 31 inventory in the same view.
         </p>
         <div className="mt-4 h-[360px] w-full min-w-0 min-h-[280px]">
           {mounted ? (
           <ResponsiveContainer width="100%" height="100%" minWidth={280}>
-            <AreaChart data={pipelineDemoSeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+            <AreaChart data={pipelineSeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <defs>
                 {seriesMeta.map((m) => (
                   <linearGradient key={m.key} id={`ar-${m.key}`} x1="0" y1="0" x2="0" y2="1">
@@ -213,12 +226,12 @@ export function SubdivisionPipelineChartsSection() {
       <article id="spc-bars" className={`scroll-mt-24 md:scroll-mt-20 ${chartCard}`}>
         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Grouped bars · year-over-year</h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Neon-tinted columns for side-by-side comparison of each modeled stage.
+          Side-by-side YoY comparison; legend labels encode flow vs. year-end stock (see section header disclaimer).
         </p>
         <div className="mt-4 h-[380px] w-full min-w-0 min-h-[280px]">
           {mounted ? (
           <ResponsiveContainer width="100%" height="100%" minWidth={280}>
-            <BarChart data={pipelineDemoSeries} margin={{ top: 8, right: 8, left: 0, bottom: 24 }}>
+            <BarChart data={pipelineSeries} margin={{ top: 8, right: 8, left: 0, bottom: 24 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30 dark:opacity-20" stroke="#64748b" />
               <ReferenceArea x1="2026" x2="2028" fill="#ec4899" fillOpacity={0.04} />
               <XAxis dataKey="yearLabel" tick={{ fill: "#64748b", fontSize: 11 }} />
@@ -248,8 +261,11 @@ export function SubdivisionPipelineChartsSection() {
           Stage mix · last actual year ({lastActualYear.yearLabel})
         </h3>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Donut shows share of each modeled count vs. the five-metric total for that year (
-          {Math.round(totalMix)} indexed units — illustrative only).
+          Donut mixes{" "}
+          <span className="font-medium text-zinc-800 dark:text-zinc-200">calendar-year flows</span>{" "}
+          with <span className="font-medium text-zinc-800 dark:text-zinc-200">Dec 31 stock</span>{" "}
+          counts—use it for rough composition only; read the line charts for like-vs-like trends (
+          {Math.round(totalMix)} combined index).
         </p>
         <div className="mt-2 flex flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center">
           <div className="h-[300px] w-full max-w-md min-h-[260px]">
@@ -323,8 +339,8 @@ export function SubdivisionPipelineChartsSection() {
   );
 }
 
-function pipelineDemoFallback(): PipelineYearRow {
-  return pipelineDemoSeries[0];
+function pipelineSeriesFallback(): PipelineYearRow {
+  return pipelineSeries[0];
 }
 
 function SkeletonChart({ short }: { short?: boolean }) {

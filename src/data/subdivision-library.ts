@@ -31,12 +31,13 @@ export const subdivisionLibraryChapters: LibraryChapter[] = [
       "Subdivision economics in Greater Seattle sit inside statewide housing law and each city’s comprehensive plan. These figures frame demand for denser lots—not a guarantee any one parcel will redivide.",
     stats: [
       {
-        headline: "Washington long-range housing goal",
-        figure: "~1M new homes by 2044",
+        headline: "Washington long-range housing need (state projection)",
+        figure: "~1.1M additional homes by 2044",
         context:
-          "Cited in state housing policy discourse as a planning horizon; your feasibility still hinges on parcel-level entitlements and finance.",
-        sourceLabel: "Legislative / policy context (HB 1110 materials)",
-        sourceUrl: "https://wa-law.org/bill/2023-24/hb/1110/S2.PL/",
+          "Department of Commerce summarizes statewide housing need projections used in planning debates—parcel-level feasibility is still local.",
+        sourceLabel: "WA Commerce (state housing need publication)",
+        sourceUrl:
+          "https://www.commerce.wa.gov/news/washington-state-will-need-more-than-1-million-homes-in-next-20-years/",
       },
       {
         headline: "Largest cities — middle housing minimum (illustrative tier)",

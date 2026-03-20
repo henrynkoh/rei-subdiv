@@ -36,7 +36,7 @@ export function getLandingNavItems(): NavItem[] {
     },
     {
       id: "subdivision-pipeline-charts",
-      label: "Pipeline charts (demo data)",
+      label: "Pipeline charts (Seattle open data)",
       shortLabel: "Charts",
       children: getPipelineChartNavChildren(),
     },
