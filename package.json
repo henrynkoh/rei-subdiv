@@ -5,8 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:static": "STATIC_EXPORT=1 next build",
     "start": "next start",
     "lint": "eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/henrynkoh/rei-subdiv.git"
   },
   "dependencies": {
     "next": "16.2.0",

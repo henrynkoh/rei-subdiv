@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Seattle lot subdivision & infill curriculum (Next.js)
 
-## Getting Started
+Static curriculum viewer for a **one-week Greater Seattle bootcamp** aimed at **startup solopreneurs**. Content covers:
 
-First, run the development server:
+- Satirical “dummy guide” vs. real entitlement / finance / build steps  
+- NR / One Seattle / HB 1110 **context** (always verify with SDCI & King County before relying on numbers)  
+- Day-by-day schedule, expert playbooks, checklists, warnings, official links  
+- “Video → how-to” appendix (satire decoded)  
+- **Facilitator runbook** at `/facilitator` (print-friendly)  
+
+## Landing page (home)
+
+- **Left sidebar**: scrollable nav with **nested jumps** to every curriculum table.
+- **Scroll-spy**: the active section highlights while you read.
+- **Layout**: glass-style cards, violet/fuchsia gradients, responsive hero + feature chips.
+- **Mobile**: **Sections** button reveals the same sidebar.
+- **GitHub**: floating button at **bottom-right** — set `NEXT_PUBLIC_GITHUB_REPO_URL` in `.env.local` ([.env.example](./.env.example)).
+- **`/`** uses the immersive landing; **`/facilitator`** keeps the top site bar for quick escapes.
+
+## GitHub Pages
+
+1. Set `NEXT_PUBLIC_GITHUB_REPO_URL` (and optional `BASE_PATH` if the site is not at domain root).
+2. For `https://<user>.github.io/<repo>/`:
+
+   ```bash
+   BASE_PATH=/<repo> STATIC_EXPORT=1 npm run build
+   ```
+
+   Upload **`out/`**, or use [.github/workflows/pages.yml](.github/workflows/pages.yml) (edit `BASE_PATH` to match the repo name).
+
+3. Repo **Settings → Pages → Source**: GitHub Actions.
+
+## Documentation
+
+| Doc | Purpose |
+|-----|---------|
+| [**Quickstart**](./docs/QUICKSTART.md) | Run locally in 60 seconds; first content edit |
+| [**Tutorial**](./docs/TUTORIAL.md) | Full walkthrough: file map, editing tables, shipping |
+| [**Manual**](./docs/MANUAL.md) | Operators: routes, content model, deploy, troubleshooting |
+| [**Marketing channel kit**](./docs/MARKETING_CHANNEL_KIT.md) | Ad/post copy: Facebook, Instagram, Threads, Blogger, Naver, Tistory, WordPress, newsletter, email |
+| [**Docs index**](./docs/README.md) | All-of-docs table |
+
+## Develop
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Curriculum**: [http://localhost:3000](http://localhost:3000)  
+- **Facilitator pack**: [http://localhost:3000/facilitator](http://localhost:3000/facilitator)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Source of truth
 
-To learn more about Next.js, take a look at the following resources:
+- Cohort content: `src/data/curriculum.ts`  
+- Facilitator ops: `src/data/facilitator.ts`  
+- UI: `src/app/page.tsx`, `src/app/facilitator/page.tsx`, `src/components/*`  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Legal / accuracy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This site is **educational only**. Zoning, subdivision, and finance rules change—confirm with Seattle SDCI, King County, lenders, and qualified counsel before any transaction.
 
-## Deploy on Vercel
+## Project tracking
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`tasks/todo.md`](./tasks/todo.md) for planning notes.
