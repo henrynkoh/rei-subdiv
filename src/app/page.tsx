@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CaseStudiesSection } from "@/components/CaseStudiesSection";
+import { RegisteredProjectsSection } from "@/components/RegisteredProjectsSection";
 import { CurriculumTableBlock } from "@/components/CurriculumTableBlock";
 import { HeroFeaturePills } from "@/components/HeroFeaturePills";
 import { LandingExperience } from "@/components/LandingExperience";
@@ -58,6 +59,8 @@ export default function Home() {
 
       <main id="main" className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
         <CaseStudiesSection />
+
+        <RegisteredProjectsSection />
 
         <section id="links" className={`mb-10 scroll-mt-24 border border-indigo-200/50 md:scroll-mt-20 ${card}`}>
           <div className="flex items-start gap-3">

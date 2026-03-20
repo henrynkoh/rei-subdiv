@@ -1,5 +1,6 @@
 import { getCaseStudyNavChildren } from "@/data/case-studies";
 import { categories } from "@/data/curriculum";
+import { getRegisteredProjectNavChildren } from "@/data/registered-projects";
 import { tableAnchorId } from "@/lib/slug";
 
 export type NavItem = {
@@ -18,6 +19,12 @@ export function getLandingNavItems(): NavItem[] {
       label: "Case studies (top 3)",
       shortLabel: "Cases",
       children: getCaseStudyNavChildren(),
+    },
+    {
+      id: "registered-projects",
+      label: "Registered projects (6)",
+      shortLabel: "Reg.",
+      children: getRegisteredProjectNavChildren(),
     },
     { id: "links", label: "Bookmarks & links", shortLabel: "Links" },
     { id: "research", label: "Research synthesis", shortLabel: "Research" },
